@@ -1,4 +1,4 @@
-package com.gemalto.jp2;
+package com.incode.jp2;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
@@ -28,7 +28,7 @@ public class JP2Decoder {
     private static final String TAG = "JP2Decoder";
 
     static {
-        System.loadLibrary("openjpeg");
+        System.loadLibrary("incode-openjpeg");
     }
 
     public static class Header {

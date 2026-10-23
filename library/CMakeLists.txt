@@ -13,7 +13,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSE_JPIP")
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             openjpeg
+             incode-openjpeg
 
              # Sets the library as a shared library.
              SHARED
@@ -51,7 +51,7 @@ add_library( # Sets the name of the library.
              src/main/cpp/openjpg.cpp
              )
 
-target_include_directories(openjpeg PRIVATE src/main/cpp src/main/cpp/openjpeg/src/lib/openjp2 src/main/cpp/openjpeg/src/bin/common)
+target_include_directories(incode-openjpeg PRIVATE src/main/cpp src/main/cpp/openjpeg/src/lib/openjp2 src/main/cpp/openjpeg/src/bin/common)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -70,8 +70,13 @@ find_library( # Sets the name of the path variable.
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
-target_link_libraries(openjpeg)
+target_link_libraries(incode-openjpeg ${log-lib})
 
 # Use the following linker flags to support compiling 16 KB-aligned 
 # shared libraries with Android NDK version r27 or lower.
-target_link_options(openjpeg PRIVATE ${log-lib} "-Wl,-z,max-page-size=16384,-z,common-page-size=16384")
+target_link_options(incode-openjpeg PRIVATE
+    "-Wl,-z,max-page-size=16384,-z,common-page-size=16384"
+    "-Wl,--exclude-libs,ALL"
+    "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/exports.map"
+)
+set_property(TARGET incode-openjpeg APPEND PROPERTY LINK_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/exports.map")

@@ -1,4 +1,4 @@
-package com.gemalto.jp2;
+package com.incode.jp2;
 
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -47,7 +47,7 @@ public class JP2Encoder {
     private int outputFormat = FORMAT_JP2;
 
     static {
-        System.loadLibrary("openjpeg");
+        System.loadLibrary("incode-openjpeg");
     }
 
     private final Bitmap bmp;

@@ -1,21 +1,73 @@
-# JP2 for Android
+# Incode JP2 for Android
 ---------------------------
 An open-source JPEG-2000 image encoder/decoder for Android based on [OpenJPEG](http://www.openjpeg.org/) v2.5.4.
+
+This fork starts from [Thales JP2ForAndroid 1.1.0](https://github.com/ThalesGroup/JP2ForAndroid/tree/1.1.0), commit `8ad43abb5d8e2caf2147162d3bfe5569581b5d1f`.
+It uses the Java package `com.incode.jp2` and the native library `libincode-openjpeg.so`.
+The native library exports only its JNI entry points and preserves 16 KB page alignment on all four Android ABIs.
+
+## Build the Incode artifact
+
+Use JDK 17, Android SDK 36, NDK `23.2.8568313`, and CMake `3.22.1`.
+The library supports Android API 16 and later. The test app uses API 23 and later.
+
+```sh
+./gradlew :jp2-android:assembleRelease
+./gradlew :jp2-android:publishReleasePublicationToStagingRepository
+```
+
+The release AAR is `library/build/outputs/aar/jp2-android-release.aar`.
+The second command creates a local Maven repository under `build/staging-repo`. It does not upload artifacts.
+Remote publication to Nexus and GitHub Packages requires a separate CI workflow.
+
+## Native tests
+
+Connect an Android device or start an emulator, then run the existing codec tests:
+
+```sh
+./gradlew :jp2-android:connectedDebugAndroidTest
+./gradlew :testapp:connectedDebugAndroidTest
+```
+
+The test app also contains keiji 1.0.5 to exercise coexistence with a real second decoder.
+That dependency does not ship in the release AAR or its Maven metadata.
+Run the coexistence test in separate processes for each library load order:
+
+```sh
+./gradlew :testapp:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.incode.jp2.test.TestDecoderCoexistence#testBothDecodersPreservePixels -Pandroid.testInstrumentationRunnerArguments.decoderLoadOrder=incodeFirst
+./gradlew :testapp:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.incode.jp2.test.TestDecoderCoexistence#testBothDecodersPreservePixels -Pandroid.testInstrumentationRunnerArguments.decoderLoadOrder=originalFirst
+```
+
+To test the release AAR as a Maven dependency, first create the local Maven repository with the publication command above.
+Then add `-PcodecFromStaging=true` to either test app command.
+
+Local verification on 2026-10-23 passed all 26 upstream codec tests and both coexistence tests on ARM64 emulators:
+
+- Android 14 with 4 KB pages.
+- Android 15 with 16 KB pages.
+
+The staged release AAR passed both decoder loading orders on both emulators.
+ELF alignment passed for all four ABIs, and the test app APK passed `zipalign -c -P 16 4`.
+SDK integration, API 23 runtime tests, and protected SDK release tests remain pending.
 
 ## Set up
 Add dependency to your `build.gradle`:
 ```groovy
-implementation 'io.github.michaldvorak-gemalto:jp2-android:1.1.0'
+implementation 'com.incode.sdk:jp2-android:1.1.0-incode.1'
 ```
 
 ## Basic Usage
 Decoding an image:
 ```java
+import com.incode.jp2.JP2Decoder;
+
 Bitmap bmp = new JP2Decoder(jp2data).decode();
 imgView.setImageBitmap(bmp);
 ```
 Encoding an image:
 ```java
+import com.incode.jp2.JP2Encoder;
+
 Bitmap bmp = ...;
 //lossless encode
 byte[] jp2data = new JP2Encoder(bmp).encode();
