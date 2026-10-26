@@ -18,7 +18,58 @@ The library supports Android API 16 and later. The test app uses API 23 and late
 
 The release AAR is `library/build/outputs/aar/jp2-android-release.aar`.
 The second command creates a local Maven repository under `build/staging-repo`. It does not upload artifacts.
-Remote publication to Nexus and GitHub Packages requires a separate CI workflow.
+
+## Build with GitHub Actions
+
+The **Build decoder AAR** workflow runs on pushes and pull requests.
+It uses the same Java, Android SDK, NDK, and CMake versions as the local build.
+It builds the release AAR, runs Android lint, and creates the Maven staging repository.
+
+Open the workflow run in the repository's **Actions** tab.
+Download `jp2-android-<commit>` from **Artifacts**.
+The download contains the AAR, Maven metadata, sources JAR, SHA-256 checksum, and source commit.
+After the workflow reaches the default branch, **Run workflow** also starts it manually.
+If Actions is disabled for the fork, a repository administrator must enable it first.
+
+The workflow needs no Maven credentials. It uploads build results to GitHub Actions only.
+It does not publish to Nexus or GitHub Packages. Native device tests run separately with the commands below.
+To publish a downloaded build, use its `build/staging-repo` directory with the publication commands below.
+Published versions are immutable. If a rebuilt artifact has different bytes, publish it with a new version.
+
+## Publish locally
+
+Store these credentials in `~/.gradle/gradle.properties` or environment variables with the same names:
+
+| Repository | Username key | Password key |
+| --- | --- | --- |
+| Nexus | `nexus_username` | `nexus_password` |
+| GitHub Packages | `github_username` | `github_pat` |
+
+The GitHub token needs `write:packages` scope and write access to `Incode-Technologies-Example-Repos/android-omni-packages`.
+Keep credential values outside this repository.
+
+Create the staging repository with the command above.
+For a new version, first run `./gradlew clean` to remove earlier staged versions.
+Before an upload, run both conflict checks:
+
+Set `JP2_NEXUS_URL` to the internal Maven releases repository URL before running these commands.
+
+```sh
+bash scripts/uploadStagedRepo.sh build/staging-repo "$JP2_NEXUS_URL" nexus_username nexus_password --check-only
+bash scripts/uploadStagedRepo.sh build/staging-repo https://maven.pkg.github.com/incode-technologies-example-repos/android-omni-packages github_username github_pat --check-only
+```
+
+After both checks pass, upload the same staged files to both repositories:
+
+```sh
+bash scripts/uploadStagedRepo.sh build/staging-repo "$JP2_NEXUS_URL" nexus_username nexus_password --immutable
+bash scripts/uploadStagedRepo.sh build/staging-repo https://maven.pkg.github.com/incode-technologies-example-repos/android-omni-packages github_username github_pat --immutable
+```
+
+The uploader rejects existing version files with different bytes and downloads each uploaded file to verify its contents.
+If an upload stops partway, rerun it with the same staging directory.
+The scripts use the staged-file publication process from the Incode Android SDK.
+Local publication does not require Bitrise.
 
 ## Native tests
 
@@ -48,7 +99,8 @@ Local verification on 2026-10-23 passed all 26 upstream codec tests and both coe
 
 The staged release AAR passed both decoder loading orders on both emulators.
 ELF alignment passed for all four ABIs, and the test app APK passed `zipalign -c -P 16 4`.
-SDK integration, API 23 runtime tests, and protected SDK release tests remain pending.
+SDK integration tests passed with synthetic JP2, raw J2K, and JPEG portraits on a 16 KB emulator.
+API 23 runtime tests and protected SDK release tests remain pending.
 
 ## Set up
 Add dependency to your `build.gradle`:
