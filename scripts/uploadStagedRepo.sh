@@ -224,6 +224,6 @@ while IFS= read -r artifact_dir; do
     echo "Another job changed $artifact_path/maven-metadata.xml. The script merges it again."
     attempt=$((attempt + 1))
   done
-done < <(find "$repo_dir" -name '*.pom' -exec dirname {} \; | xargs -n1 dirname | sort -u)
+done < <(find "$repo_dir" -name '*.pom' -exec dirname {} \; | while IFS= read -r version_dir; do dirname "$version_dir"; done | sort -u)
 
 echo "Uploaded $count files to $repo_url."
