@@ -1,4 +1,4 @@
-package com.gemalto.jp2.test;
+package com.incode.jp2.test;
 
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -16,7 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.gemalto.jp2.JP2Decoder;
+import com.incode.jp2.JP2Decoder;
 
 import java.io.Closeable;
 import java.io.IOException;

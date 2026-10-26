@@ -1,16 +1,21 @@
 plugins {
-    id "com.vanniktech.maven.publish" version "0.37.0" apply(true)
+    id 'com.android.library'
+    id 'maven-publish'
 }
-apply plugin: 'com.android.library'
+
+group = 'com.incode.sdk'
+version = '1.1.0-incode.1'
 
 android {
-    compileSdk = 37
-    namespace = 'com.gemalto.jp2'
+    compileSdk = 36
+    namespace = 'com.incode.jp2'
     defaultConfig {
         minSdk 16
-        targetSdk 37
-        versionName "1.1.0"
-        versionCode 6
+        targetSdk 33
+        consumerProguardFiles 'consumer-rules.pro'
+        aarMetadata {
+            minCompileSdk = 36
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -26,13 +31,22 @@ android {
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
+            version '3.22.1'
         }
     }
     buildFeatures {
         buildConfig = true
     }
     ndkVersion = '23.2.8568313'
-    enableKotlin = false
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
+    }
 }
 
 dependencies {
@@ -45,32 +59,49 @@ dependencies {
 /*************************************************************/
 /******************* PUBLISHING STUFF ************************/
 /*************************************************************/
-mavenPublishing {
-    publishToMavenCentral()
-    signAllPublications()
-    coordinates("io.github.michaldvorak-gemalto", "jp2-android", "${android.defaultConfig.versionName}")
-
-    pom {
-        name = "JP2ForAndroid"
-        description = "A JPEG-2000 image encoder/decoder for Android"
-        inceptionYear = "2019"
-        url = "https://github.com/ThalesGroup/JP2ForAndroid"
-        licenses {
-            license {
-                name = "The 2-Clause BSD License"
-                url = "https://opensource.org/licenses/BSD-2-Clause"
-                distribution = "repo"
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = project.group
+            artifactId = 'jp2-android'
+            version = project.version
+            afterEvaluate {
+                from components.release
+            }
+            pom {
+                name = 'Incode JP2ForAndroid'
+                description = 'Incode fork of Thales JP2ForAndroid 1.1.0 with OpenJPEG 2.5.4'
+                inceptionYear = '2019'
+                url = 'https://github.com/Incode-Technologies-Example-Repos/JP2ForAndroid'
+                licenses {
+                    license {
+                        name = 'The 2-Clause BSD License'
+                        url = 'https://opensource.org/licenses/BSD-2-Clause'
+                        distribution = 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                        name = 'Michal Dvorak'
+                        url = 'https://github.com/michaldvorak-gemalto'
+                    }
+                    developer {
+                        name = 'Incode Android SDK Team'
+                        organization = 'Incode'
+                        organizationUrl = 'https://incode.com'
+                    }
+                }
+                scm {
+                    url = 'https://github.com/Incode-Technologies-Example-Repos/JP2ForAndroid'
+                    connection = 'scm:git:https://github.com/Incode-Technologies-Example-Repos/JP2ForAndroid.git'
+                }
             }
         }
-        developers {
-            developer {
-                name = "Michal Dvorak"
-                url = "https://github.com/michaldvorak-gemalto"
-            }
-        }
-        scm {
-            url = "https://github.com/ThalesGroup/JP2ForAndroid"
-            connection = "scm:git:https://github.com/ThalesGroup/JP2ForAndroid.git"
+    }
+    repositories {
+        maven {
+            name = 'staging'
+            url = rootProject.layout.buildDirectory.dir('staging-repo')
         }
     }
 }

@@ -940,7 +940,7 @@ int encodeJP2(opj_cparameters_t *parameters, opj_image_t *image, opj_byte_array_
 }
 
 //encode a raw bitmap into JPEG-2000, return the result in a byte array
-JNIEXPORT jbyteArray JNICALL Java_com_gemalto_jp2_JP2Encoder_encodeJP2ByteArray(JNIEnv *env, jclass thiz, jintArray pixels, jboolean hasAlpha, jint width, jint height,
+JNIEXPORT jbyteArray JNICALL Java_com_incode_jp2_JP2Encoder_encodeJP2ByteArray(JNIEnv *env, jclass thiz, jintArray pixels, jboolean hasAlpha, jint width, jint height,
                                                                              jint fileFormat, jint numResolutions, jfloatArray compressionRates, jfloatArray qualityValues) {
     opj_byte_array_source * jp2data = NULL;
     opj_cparameters_t parameters;    /* compression parameters */
@@ -974,7 +974,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_gemalto_jp2_JP2Encoder_encodeJP2ByteArray(
 }
 
 //encode a raw bitmap into JPEG-2000, store the result into a file, return success/failure
-JNIEXPORT jint JNICALL Java_com_gemalto_jp2_JP2Encoder_encodeJP2File(JNIEnv *env, jclass thiz, jstring fileName, jintArray pixels, jboolean hasAlpha, jint width, jint height,
+JNIEXPORT jint JNICALL Java_com_incode_jp2_JP2Encoder_encodeJP2File(JNIEnv *env, jclass thiz, jstring fileName, jintArray pixels, jboolean hasAlpha, jint width, jint height,
                                                                         jint fileFormat, jint numResolutions, jfloatArray compressionRates, jfloatArray qualityValues) {
     opj_cparameters_t parameters;    /* compression parameters */
     opj_image_t *image = NULL;
@@ -1017,7 +1017,7 @@ jintArray prepareReturnHeaderData(JNIEnv *env, image_header_t *outHeader) {
 }
 
 //decode a JPEG-2000 encoded file, return in 32-bit raw RGBA pixels
-JNIEXPORT jintArray JNICALL Java_com_gemalto_jp2_JP2Decoder_decodeJP2File(JNIEnv *env, jclass thiz, jstring fileName, jint reduce, jint layers,
+JNIEXPORT jintArray JNICALL Java_com_incode_jp2_JP2Decoder_decodeJP2File(JNIEnv *env, jclass thiz, jstring fileName, jint reduce, jint layers,
                                                      jint left, jint top, jint right, jint bottom) {
     opj_stream_t *l_stream = NULL;                /* Stream */
     opj_dparameters_t parameters;            /* decompression parameters */
@@ -1065,7 +1065,7 @@ JNIEXPORT jintArray JNICALL Java_com_gemalto_jp2_JP2Decoder_decodeJP2File(JNIEnv
 }
 
 //decode a JPEG-2000 encoded byte array, return in 32-bit raw RGBA pixels
-JNIEXPORT jintArray JNICALL Java_com_gemalto_jp2_JP2Decoder_decodeJP2ByteArray(JNIEnv *env, jclass thiz, jbyteArray data,
+JNIEXPORT jintArray JNICALL Java_com_incode_jp2_JP2Decoder_decodeJP2ByteArray(JNIEnv *env, jclass thiz, jbyteArray data,
                   jint reduce, jint layers, jint left, jint top, jint right, jint bottom) {
     opj_stream_t *l_stream = NULL;                /* Stream */
     opj_dparameters_t parameters;            /* decompression parameters */
@@ -1124,7 +1124,7 @@ JNIEXPORT jintArray JNICALL Java_com_gemalto_jp2_JP2Decoder_decodeJP2ByteArray(J
 }
 
 //read meta-data information from a JPEG-2000 encoded file, return in an integer array (image_header_t representation)
-JNIEXPORT jintArray JNICALL Java_com_gemalto_jp2_JP2Decoder_readJP2HeaderFile(JNIEnv *env, jclass thiz, jstring fileName) {
+JNIEXPORT jintArray JNICALL Java_com_incode_jp2_JP2Decoder_readJP2HeaderFile(JNIEnv *env, jclass thiz, jstring fileName) {
     opj_stream_t *l_stream = NULL;                /* Stream */
     opj_dparameters_t parameters;            /* decompression parameters */
     image_header_t outHeader; //output data
@@ -1165,7 +1165,7 @@ JNIEXPORT jintArray JNICALL Java_com_gemalto_jp2_JP2Decoder_readJP2HeaderFile(JN
 }
 
 //read meta-data information from a JPEG-2000 encoded byte array, return in an integer array (image_header_t representation)
-JNIEXPORT jintArray JNICALL Java_com_gemalto_jp2_JP2Decoder_readJP2HeaderByteArray(JNIEnv *env, jclass thiz, jbyteArray data) {
+JNIEXPORT jintArray JNICALL Java_com_incode_jp2_JP2Decoder_readJP2HeaderByteArray(JNIEnv *env, jclass thiz, jbyteArray data) {
     opj_stream_t *l_stream = NULL;                /* Stream */
     opj_dparameters_t parameters;            /* decompression parameters */
     char *imgData;

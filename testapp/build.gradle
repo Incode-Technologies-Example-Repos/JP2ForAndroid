@@ -1,15 +1,29 @@
 apply plugin: 'com.android.application'
 
+def codecFromStaging = providers.gradleProperty('codecFromStaging').map { it.toBoolean() }.getOrElse(false)
+
+if (codecFromStaging) {
+    repositories {
+        maven {
+            url = rootProject.layout.buildDirectory.dir('staging-repo')
+            content {
+                includeGroup 'com.incode.sdk'
+            }
+        }
+    }
+}
+
 android {
-    compileSdk = 37
-    namespace = "com.gemalto.jp2.test"
+    compileSdk = 36
+    namespace = "com.incode.jp2.test"
 
     defaultConfig {
-        applicationId "com.gemalto.openjpeg.test"
-        minSdk 16
-        targetSdk 37
+        applicationId "com.incode.jp2.testapp"
+        minSdk 23
+        targetSdk 33
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
     signingConfigs {
@@ -45,7 +59,14 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':jp2-android')
+    if (codecFromStaging) {
+        implementation "com.incode.sdk:jp2-android:${project(':jp2-android').version}"
+    } else {
+        implementation project(':jp2-android')
+    }
+    implementation 'dev.keiji.jp2:jp2-android:1.0.5'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.core:core:1.12.0'

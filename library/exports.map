@@ -1,0 +1,12 @@
+{
+    global:
+        JNI_OnLoad;
+        Java_com_incode_jp2_JP2Decoder_decodeJP2File;
+        Java_com_incode_jp2_JP2Decoder_decodeJP2ByteArray;
+        Java_com_incode_jp2_JP2Decoder_readJP2HeaderFile;
+        Java_com_incode_jp2_JP2Decoder_readJP2HeaderByteArray;
+        Java_com_incode_jp2_JP2Encoder_encodeJP2File;
+        Java_com_incode_jp2_JP2Encoder_encodeJP2ByteArray;
+    local:
+        *;
+};
